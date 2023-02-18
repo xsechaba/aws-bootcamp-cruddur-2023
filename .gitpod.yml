@@ -1,3 +1,4 @@
+
 tasks:
   - name: aws-cli
     env:
@@ -9,3 +10,6 @@ tasks:
       sudo ./aws/install
       cd $THEIA_WORKSPACE_ROOT
     
+vscode:
+  extensions:
+    - 42crunch.vscode-openapi
