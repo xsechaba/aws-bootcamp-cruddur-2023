@@ -14,13 +14,14 @@ with the help of the videos, I:
 - This is important because Docker containers are lightweight and provide a consistent environment for developing and deploying applications. 
 - By adding the Docker extension, I can easily create and manage containers without leaving the Gitpod IDE. 
 - This helps to streamline the development process, making it faster and more efficient.
-- 
+
 ![docker extension-cropped](https://user-images.githubusercontent.com/117948251/221643253-6e461bfe-e3b2-488a-937e-95193c96c9ad.png)
 
 ### **containerized the app, both the backend and the frontend:**
 - Containerizing the app involves packaging the application code and its dependencies into Docker containers.
 - This is important because it allows the application to run consistently and reliably across different environments, such as development, testing, and production. 
 - Containerizing the backend and frontend of the app, it makes it easy for me to deploy the app on any infrastructure that supports Docker, such as Kubernetes. 
+
 **1. Backend verification:**
 
 ![backend containerize](https://user-images.githubusercontent.com/117948251/221643897-f95bbd2e-f243-4eef-b392-6c59ff806ddc.png)
