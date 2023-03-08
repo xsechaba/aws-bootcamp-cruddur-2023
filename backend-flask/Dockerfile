@@ -12,6 +12,7 @@ COPY requirements.txt requirements.txt
 # Install python libraries used for the app
 RUN pip3 install -r requirements.txt
 
+# Outside Container -> Inside Container
 # . means everything in the current directory
 # first . is everything in /backend-flask (Outside container)
 # second . is everything in backend-flask (Inside container)
