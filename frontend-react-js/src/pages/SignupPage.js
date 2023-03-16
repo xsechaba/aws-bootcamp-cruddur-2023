@@ -1,44 +1,50 @@
-import './SignupPage.css';
+import './RecoverPage.css';
 import React from "react";
 import {ReactComponent as Logo} from '../components/svg/logo.svg';
 import { Link } from "react-router-dom";
+import { Auth } from 'aws-amplify';
 
-// [TODO] Authenication
-import Cookies from 'js-cookie'
-
-export default function SignupPage() {
-
+export default function RecoverPage() {
   // Username is Eamil
-  const [name, setName] = React.useState('');
-  const [email, setEmail] = React.useState('');
   const [username, setUsername] = React.useState('');
   const [password, setPassword] = React.useState('');
+  const [passwordAgain, setPasswordAgain] = React.useState('');
+  const [code, setCode] = React.useState('');
   const [errors, setErrors] = React.useState('');
+  const [formState, setFormState] = React.useState('send_code');
 
-  const onsubmit = async (event) => {
+  const onsubmit_send_code = async (event) => {
     event.preventDefault();
-    console.log('SignupPage.onsubmit')
-    // [TODO] Authenication
-    Cookies.set('user.name', name)
-    Cookies.set('user.username', username)
-    Cookies.set('user.email', email)
-    Cookies.set('user.password', password)
-    Cookies.set('user.confirmation_code',1234)
-    window.location.href = `/confirm?email=${email}`
+    setErrors('')
+    Auth.forgotPassword(username)
+    .then((data) => setFormState('confirm_code') )
+    .catch((err) => setErrors(err.message) );
+    return false
+  }
+  const onsubmit_confirm_code = async (event) => {
+    event.preventDefault();
+    setErrors('')
+    if (password == passwordAgain){
+      Auth.forgotPasswordSubmit(username, code, password)
+      .then((data) => setFormState('success'))
+      .catch((err) => setErrors(err.message) );
+    } else {
+      setCognitoErrors('Passwords do not match')
+    }
     return false
   }
 
-  const name_onchange = (event) => {
-    setName(event.target.value);
-  }
-  const email_onchange = (event) => {
-    setEmail(event.target.value);
-  }
   const username_onchange = (event) => {
     setUsername(event.target.value);
   }
   const password_onchange = (event) => {
     setPassword(event.target.value);
+  }
+  const password_again_onchange = (event) => {
+    setPasswordAgain(event.target.value);
+  }
+  const code_onchange = (event) => {
+    setCode(event.target.value);
   }
 
   let el_errors;
@@ -46,66 +52,99 @@ export default function SignupPage() {
     el_errors = <div className='errors'>{errors}</div>;
   }
 
-  return (
-    <article className='signup-article'>
-      <div className='signup-info'>
-        <Logo className='logo' />
-      </div>
-      <div className='signup-wrapper'>
-        <form 
-          className='signup_form'
-          onSubmit={onsubmit}
-        >
-          <h2>Sign up to create a Cruddur account</h2>
-          <div className='fields'>
-            <div className='field text_field name'>
-              <label>Name</label>
-              <input
-                type="text"
-                value={name}
-                onChange={name_onchange} 
-              />
-            </div>
-
-            <div className='field text_field email'>
-              <label>Email</label>
-              <input
-                type="text"
-                value={email}
-                onChange={email_onchange} 
-              />
-            </div>
-
-            <div className='field text_field username'>
-              <label>Username</label>
-              <input
-                type="text"
-                value={username}
-                onChange={username_onchange} 
-              />
-            </div>
-
-            <div className='field text_field password'>
-              <label>Password</label>
-              <input
-                type="password"
-                value={password}
-                onChange={password_onchange} 
-              />
-            </div>
-          </div>
-          {el_errors}
-          <div className='submit'>
-            <button type='submit'>Sign Up</button>
-          </div>
-        </form>
-        <div className="already-have-an-account">
-          <span>
-            Already have an account?
-          </span>
-          <Link to="/signin">Sign in!</Link>
+  const send_code = () => {
+    return (<form 
+      className='recover_form'
+      onSubmit={onsubmit_send_code}
+    >
+      <h2>Recover your Password</h2>
+      <div className='fields'>
+        <div className='field text_field username'>
+          <label>Email</label>
+          <input
+            type="text"
+            value={username}
+            onChange={username_onchange} 
+          />
         </div>
       </div>
+      {el_errors}
+      <div className='submit'>
+        <button type='submit'>Send Recovery Code</button>
+      </div>
+
+    </form>
+    )
+  }
+
+  const confirm_code = () => {
+    return (<form 
+      className='recover_form'
+      onSubmit={onsubmit_confirm_code}
+    >
+      <h2>Recover your Password</h2>
+      <div className='fields'>
+        <div className='field text_field code'>
+          <label>Reset Password Code</label>
+          <input
+            type="text"
+            value={code}
+            onChange={code_onchange} 
+          />
+        </div>
+        <div className='field text_field password'>
+          <label>New Password</label>
+          <input
+            type="password"
+            value={password}
+            onChange={password_onchange} 
+          />
+        </div>
+        <div className='field text_field password_again'>
+          <label>New Password Again</label>
+          <input
+            type="password"
+            value={passwordAgain}
+            onChange={password_again_onchange} 
+          />
+        </div>
+      </div>
+      {errors}
+      <div className='submit'>
+        <button type='submit'>Reset Password</button>
+      </div>
+    </form>
+    )
+  }
+
+  const success = () => {
+    return (<form>
+      <p>Your password has been successfully reset!</p>
+      <Link to="/signin" className="proceed">Proceed to Signin</Link>
+    </form>
+    )
+    }
+
+  let form;
+  if (formState == 'send_code') {
+    form = send_code()
+  }
+  else if (formState == 'confirm_code') {
+    form = confirm_code()
+  }
+  else if (formState == 'success') {
+    form = success()
+  }
+
+  return (
+    <article className="recover-article">
+      <div className='recover-info'>
+        <Logo className='logo' />
+      </div>
+      <div className='recover-wrapper'>
+        {form}
+      </div>
+
     </article>
   );
 }
